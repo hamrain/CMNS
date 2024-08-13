@@ -1,8 +1,8 @@
 #!/bin/bash
 
-NUM_GPU=1
+NUM_GPU=2
 export OMP_NUM_THREADS=4
-export CUDA_VISIBLE_DEVICES=0,1
+export CUDA_VISIBLE_DEVICES=0
 
 # template for bert, originate from PromptBERT
 TEMPLATE="*cls*_This_sentence_of_\"*sent_0*\"_means*mask*.*sep+*"
@@ -10,11 +10,11 @@ TEMPLATE2="*cls*_This_sentence_:_\"*sent_0*\"_means*mask*.*sep+*"
 
 
 python -m torch.distributed.launch --nproc_per_node $NUM_GPU --master_port 14481  train_prompt.py \
-    --model_name_or_path ./bert-base-uncased \
+    --model_name_or_path bert-base-uncased \
     --train_file data/wiki1m_for_simcse.txt \
     --output_dir result/CMNS-pro-bert \
     --num_train_epochs 1 \
-    --per_device_train_batch_size 128 \
+    --per_device_train_batch_size 256 \
     --gradient_accumulation_steps 1 \
     --save_steps 125 \
     --save_total_limit 1 \
@@ -37,7 +37,7 @@ python -m torch.distributed.launch --nproc_per_node $NUM_GPU --master_port 14481
     --bml_weight 1e-5 \
     --bml_alpha 0.26 \
     --bml_beta  0.10 \
-    --guss_weight 0.27 \
+    --guss_weight 0.275 \
     --early_stop 5 \
     "$@"
 
